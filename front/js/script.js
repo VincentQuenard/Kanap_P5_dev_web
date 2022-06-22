@@ -2,11 +2,16 @@ const apiProducts = 'http://localhost:3000/api/products';
 
 fetch(apiProducts)
   .then((response) => response.json())
-  .then((data) => {
-    console.log(data);
-    
+  .then((data) => { 
     let products = data;
-    for (let product of products) {
+     displayProducts(products);
+  })
+  .catch((err) => {
+    console.log('Erreur' + err);
+  });
+
+const displayProducts = (products) => {
+   for (let product of products) {
       console.log(product.price);
       let items = document.getElementById('items');
 
@@ -34,12 +39,4 @@ fetch(apiProducts)
       ('Dis enim malesuada risus sapien gravida nulla nisl arcu. Dis enim malesuada risus sapien gravida nulla nisl arcu.');
       article.appendChild(p);
     }
-    // displayProducts();
-  })
-  .catch((err) => {
-    console.log('Erreur' + err);
-  });
-
-/*const displayProducts = () => {
-  
-};*/
+};
