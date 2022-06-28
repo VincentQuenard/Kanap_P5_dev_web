@@ -1,26 +1,22 @@
-//On déclare une variable contenant un tableau vide afin de récupérer les données de l'api de façon globale
-let productsArray = [];
+//on seléctionne le container qui va recevoir les données pour créer les produits en le stockant dans une variable
+let items = document.getElementById('items');
+
 //Récuperation de l'url de l'api
 const apiProducts = 'http://localhost:3000/api/products';
 //fetch va faire une requête à l'api si ok la réponse est traitée en json alors .then et on récupère les données dans notre variable, sinon erreur .catch
-const fetchApi = async () => {
-  await fetch(apiProducts)
-    .then((response) => response.json())
-    .then((data) => {
-      productsArray = data;
-    })
-    .catch((err) => {
-      console.log('Erreur' + err);
-    });
-};
 
-const displayProducts = async () => {
-  await fetchApi();
-  for (let product of productsArray) {
-    //on seléctionne le container qui va recevoir les données pour créer les produits en le stockant dans une variable
-    let items = document.getElementById('items');
+fetch(apiProducts)
+  .then((response) => response.json())
+  .then((data) => {
+    data.map((product) => displayProducts(product));
+  })
+  .catch((err) => {
+    console.log('Erreur' + err);
+  });
 
-    // On crée une balise a que l'on stocke dans une variable pour réutilisation
+const displayProducts = (product) => {
+ 
+  // On crée une balise a que l'on stocke dans une variable pour réutilisation
     let a = document.createElement('a');
 
     //On lui ajoute un attribut href qui va récupérer l'id du produit dans les données de l'api
@@ -52,8 +48,4 @@ const displayProducts = async () => {
     p.textContent = `${product.description}`;
     ('Dis enim malesuada risus sapien gravida nulla nisl arcu. Dis enim malesuada risus sapien gravida nulla nisl arcu.');
     article.appendChild(p);
-  }
 };
-
-displayProducts();
-
