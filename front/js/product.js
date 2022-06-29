@@ -40,9 +40,7 @@ fetch(apiProductWithId)
 
 
 const displaySelected = (product) => {
-  
-
-  //On crée la balise image avec ses attributs
+    //On crée la balise image avec ses attributs
   const imgProduct = document.createElement('img');
   imgProduct.src = `${product.imageUrl}`;
   imgProduct.alt = `${product.altTxt}`;
@@ -72,34 +70,44 @@ const displaySelected = (product) => {
 
 
 // on va créer une fonction pour sauvegarder le panier dans le local storage
-const saveBasket = (id, quantity, color) => {
+const saveBasket = (id, color, quantity) => {
   //on stocke dans une variable les données que l'on veut récupérer
-  const arrayProduct = {
+  let product = {
     idProduct: id,
-    quantityProduct:quantity,
     ColorProduct: color,
+    quantityProduct: quantity
   };
   //On stocke les données dans le local storage en transformant le tableau en une chaine de charactères
-  localStorage.setItem('panier', JSON.stringify(arrayProduct));
-  console.log(getBasket())
+ localStorage.setItem('panier', JSON.stringify(product));
+  
 };
-//On récupère le panier ??
+//On récupère le panier 
 const getBasket = () =>{
-  return localStorage.getItem('panier')
-}
+let panier = JSON.parse(localStorage.getItem('panier'))
+  if (panier == null){
+    return panier = []
+  }
+  else{
+ return panier; 
+  }
+ }
 
 
 //bouton panier listener on stocke le produit via l'api ???
  
 buttonAddToCart.addEventListener('click', () => {
-  //console.log(colorSelection.value);
-  // console.log(quantitySelection.value);
-  //console.log(idUrlProduct);
- 
-  
- saveBasket(idProduct, colorSelection.value, quantitySelection.value);
+   console.log(getBasket());
+   // Si l'utilisateur a entrer un nombre d'article entre 1 et 100 et une couleur, on sauve son panier, sinon popup
+   if (quantitySelection.value >= 1 && quantitySelection.value <= 100 && colorSelection.value !=""){
+     saveBasket(idProduct, colorSelection.value, quantitySelection.value);
+    }else{
+      alert("Veuillez entre un nombre d'articles compris entre 1 et 100 ainsi que le choix d'une couleur")
+    }
+
 
 });
+
+
 
 //localStorage.setItem("clé", "valeur")
 //localStorage.getItem("clé")
