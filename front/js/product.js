@@ -1,13 +1,12 @@
 //On récupère l'id contenue dans l'url de la page web du produit sélectionné
 const idProduct = new URL(document.location).searchParams.get('id');
-console.log(idProduct);
 
 //On déclare une variable contenant un tableau vide afin de récupérer les données de l'api de façon globale
 let productSelected = [];
 
 //VARIABLES GLOBALES
 const quantitySelection = document.querySelector('#quantity');
- 
+
 //on sélectionne la balise où sera injecté le code via js dans l'html pour afficher l'image du produit
 const itemImg = document.querySelector('.item__img');
 
@@ -32,15 +31,14 @@ const apiProductWithId = `http://localhost:3000/api/products/${idProduct}`;
 fetch(apiProductWithId)
   .then((response) => response.json())
   .then((data) => {
-    displaySelected(data)
+    displaySelected(data);
   })
   .catch((err) => {
     console.log('Erreur' + err);
   });
 
-
 const displaySelected = (product) => {
-    //On crée la balise image avec ses attributs
+  //On crée la balise image avec ses attributs
   const imgProduct = document.createElement('img');
   imgProduct.src = `${product.imageUrl}`;
   imgProduct.alt = `${product.altTxt}`;
@@ -67,7 +65,7 @@ const displaySelected = (product) => {
   }
 };
 
-
+/*
 
 // on va créer une fonction pour sauvegarder le panier dans le local storage
 const saveBasket = (id, color, quantity) => {
@@ -83,12 +81,12 @@ const saveBasket = (id, color, quantity) => {
 };
 //On récupère le panier 
 const getBasket = () =>{
-let panier = JSON.parse(localStorage.getItem('panier'))
+let panier = localStorage.getItem('panier')
   if (panier == null){
-    return panier = []
+    return []
   }
   else{
- return panier; 
+ return JSON.parse(panier); 
   }
  }
 
@@ -103,8 +101,6 @@ buttonAddToCart.addEventListener('click', () => {
     }else{
       alert("Veuillez entre un nombre d'articles compris entre 1 et 100 ainsi que le choix d'une couleur")
     }
-
-
 });
 
 
@@ -112,4 +108,58 @@ buttonAddToCart.addEventListener('click', () => {
 //localStorage.setItem("clé", "valeur")
 //localStorage.getItem("clé")
 //localStorage.clear();
+*/
+//Localstorage VAAST
 
+const saveBasket = (storageProduct) => {
+  localStorage.setItem('panier', JSON.stringify(storageProduct));
+};
+
+//On récupère le panier
+const getBasket = () => {
+  let recupProduct = localStorage.getItem('panier');
+  if (recupProduct == null) {
+    return [];
+  } else {
+    return JSON.parse(recupProduct);
+  }
+};
+
+const addBasket = (product) => {
+  let panier = getBasket();
+  let searchProduct = panier.find(
+    (p) =>
+      p.idProduct == product.idProduct &&
+      p.quantityProduct == product.quantityProduct
+  );
+
+  if (searchProduct != undefined) {
+    //ADDITIONNER LES 2 QUANTITES
+    panier.quantityProduct += searchProduct.quantityProduct;
+  } else {
+    panier.push(product);
+  }
+
+  saveBasket(panier);
+};
+
+buttonAddToCart.addEventListener('click', () => {
+  let storageProduct = {
+    idProduct: idProduct,
+    ColorProduct: colorSelection.value,
+    quantityProduct: quantitySelection.value,
+  };
+
+  // Si l'utilisateur a entrer un nombre d'article entre 1 et 100 et une couleur, on sauve son panier, sinon popup
+  if (
+    quantitySelection.value >= 1 &&
+    quantitySelection.value <= 100 &&
+    colorSelection.value != ''
+  ) {
+    addBasket(storageProduct);
+  } else {
+    alert(
+      "Veuillez entre un nombre d'articles compris entre 1 et 100 ainsi que le choix d'une couleur"
+    );
+  }
+});
