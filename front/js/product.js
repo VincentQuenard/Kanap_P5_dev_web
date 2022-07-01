@@ -109,13 +109,13 @@ buttonAddToCart.addEventListener('click', () => {
 //localStorage.getItem("clé")
 //localStorage.clear();
 */
-//Localstorage VAAST
-
+//Localstorage inspirée video Vaast
+//On stocke les données dans le local storage en transformant le tableau en une chaine de charactères
 const saveBasket = (storageProduct) => {
   localStorage.setItem('panier', JSON.stringify(storageProduct));
 };
 
-//On récupère le panier
+//On récupère le panier, s'il n'y a rien dedans, on retourne un tableau vide sinon on récupère le panier et on transforme la chaine de caractère en tableau
 const getBasket = () => {
   let recupProduct = localStorage.getItem('panier');
   if (recupProduct == null) {
@@ -124,33 +124,37 @@ const getBasket = () => {
     return JSON.parse(recupProduct);
   }
 };
-
+//gestion du panier
 const addBasket = (product) => {
   let panier = getBasket();
   let searchProduct = panier.find(
     (p) =>
-      p.idProduct == product.idProduct &&
-      p.quantityProduct == product.quantityProduct
+      p.idProduct == product.idProduct && p.ColorProduct == product.ColorProduct
   );
 
   if (searchProduct != undefined) {
-    //ADDITIONNER LES 2 QUANTITES
-    panier.quantityProduct += searchProduct.quantityProduct;
+    //Si le produit existe id/couleur ont ajoute la quantité à la précédente
+    searchProduct.quantityProduct =
+      parseInt(searchProduct.quantityProduct) +
+      parseInt(product.quantityProduct);
   } else {
+    //Sinon on ajoute le produit au localStorage
     panier.push(product);
   }
-
+  console.log(getBasket());
+//on met à jour le localStorage 
   saveBasket(panier);
 };
 
 buttonAddToCart.addEventListener('click', () => {
+  //on stocke dans une variable les données que l'on veut récupérer
   let storageProduct = {
     idProduct: idProduct,
     ColorProduct: colorSelection.value,
     quantityProduct: quantitySelection.value,
   };
 
-  // Si l'utilisateur a entrer un nombre d'article entre 1 et 100 et une couleur, on sauve son panier, sinon popup
+  // Si l'utilisateur a entrer un nombre d'article entre 1 et 100 et une couleur, on sauve son panier, sinon popup alert
   if (
     quantitySelection.value >= 1 &&
     quantitySelection.value <= 100 &&
