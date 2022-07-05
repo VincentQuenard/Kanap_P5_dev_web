@@ -1,9 +1,6 @@
 //On récupère l'id contenue dans l'url de la page web du produit sélectionné
 const idProduct = new URL(document.location).searchParams.get('id');
 
-//On déclare une variable contenant un tableau vide afin de récupérer les données de l'api de façon globale
-let productSelected = [];
-
 //VARIABLES GLOBALES
 const quantitySelection = document.querySelector('#quantity');
 
@@ -65,51 +62,13 @@ const displaySelected = (product) => {
   }
 };
 
-/*
-
-// on va créer une fonction pour sauvegarder le panier dans le local storage
-const saveBasket = (id, color, quantity) => {
-  //on stocke dans une variable les données que l'on veut récupérer
-  let product = {
-    idProduct: id,
-    ColorProduct: color,
-    quantityProduct: quantity
-  };
-  //On stocke les données dans le local storage en transformant le tableau en une chaine de charactères
- localStorage.setItem('panier', JSON.stringify(product));
-  
-};
-//On récupère le panier 
-const getBasket = () =>{
-let panier = localStorage.getItem('panier')
-  if (panier == null){
-    return []
-  }
-  else{
- return JSON.parse(panier); 
-  }
- }
-
-
-//bouton panier listener on stocke le produit via l'api ???
- 
-buttonAddToCart.addEventListener('click', () => {
-   console.log(getBasket());
-   // Si l'utilisateur a entrer un nombre d'article entre 1 et 100 et une couleur, on sauve son panier, sinon popup
-   if (quantitySelection.value >= 1 && quantitySelection.value <= 100 && colorSelection.value !=""){
-     saveBasket(idProduct, colorSelection.value, quantitySelection.value);
-    }else{
-      alert("Veuillez entre un nombre d'articles compris entre 1 et 100 ainsi que le choix d'une couleur")
-    }
-});
-
 
 
 //localStorage.setItem("clé", "valeur")
 //localStorage.getItem("clé")
 //localStorage.clear();
-*/
-//Localstorage inspirée video Vaast
+
+
 //On stocke les données dans le local storage en transformant le tableau en une chaine de charactères
 const saveBasket = (storageProduct) => {
   localStorage.setItem('panier', JSON.stringify(storageProduct));
@@ -125,18 +84,18 @@ const getBasket = () => {
   }
 };
 //gestion du panier
-const addBasket = (product) => {
+const addToBasket = (product) => {
   let panier = getBasket();
   let searchProduct = panier.find(
     (p) =>
-      p.idProduct == product.idProduct && p.ColorProduct == product.ColorProduct
+      p.product == product.product && p.color == product.color
   );
 
   if (searchProduct != undefined) {
     //Si le produit existe id/couleur ont ajoute la quantité à la précédente
-    searchProduct.quantityProduct =
-      parseInt(searchProduct.quantityProduct) +
-      parseInt(product.quantityProduct);
+    searchProduct.quantity =
+      parseInt(searchProduct.quantity) +
+      parseInt(product.quantity);
   } else {
     //Sinon on ajoute le produit au localStorage
     panier.push(product);
@@ -149,21 +108,24 @@ const addBasket = (product) => {
 buttonAddToCart.addEventListener('click', () => {
   //on stocke dans une variable les données que l'on veut récupérer
   let storageProduct = {
-    idProduct: idProduct,
-    ColorProduct: colorSelection.value,
-    quantityProduct: quantitySelection.value,
+    id: idProduct,
+    color: colorSelection.value,
+    quantity: quantitySelection.value,
+    
   };
-
+console.log(storageProduct);
   // Si l'utilisateur a entrer un nombre d'article entre 1 et 100 et une couleur, on sauve son panier, sinon popup alert
   if (
     quantitySelection.value >= 1 &&
     quantitySelection.value <= 100 &&
     colorSelection.value != ''
   ) {
-    addBasket(storageProduct);
+    addToBasket(storageProduct);
   } else {
     alert(
       "Veuillez entre un nombre d'articles compris entre 1 et 100 ainsi que le choix d'une couleur"
     );
   }
 });
+
+

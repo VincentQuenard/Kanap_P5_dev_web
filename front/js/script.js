@@ -1,7 +1,7 @@
 //on seléctionne le container qui va recevoir les données pour créer les produits en le stockant dans une variable
-let items = document.getElementById('items');
+const items = document.getElementById('items');
 
-//Récuperation de l'url de l'api
+//Récuperation de l'url de l'api pour pouvoir traiter les produits
 const apiProducts = 'http://localhost:3000/api/products';
 //fetch va faire une requête à l'api si ok la réponse est traitée en json alors .then et on récupère les données dans notre variable, sinon erreur .catch
 
@@ -46,6 +46,6 @@ const displayProducts = (product) => {
     let p = document.createElement('p');
     p.className = 'productDescription';
     p.textContent = `${product.description}`;
-    ('Dis enim malesuada risus sapien gravida nulla nisl arcu. Dis enim malesuada risus sapien gravida nulla nisl arcu.');
+   
     article.appendChild(p);
 };
