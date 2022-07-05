@@ -111,9 +111,9 @@ buttonAddToCart.addEventListener('click', () => {
     id: idProduct,
     color: colorSelection.value,
     quantity: quantitySelection.value,
-    
+
   };
-console.log(storageProduct);
+
   // Si l'utilisateur a entrer un nombre d'article entre 1 et 100 et une couleur, on sauve son panier, sinon popup alert
   if (
     quantitySelection.value >= 1 &&
@@ -123,7 +123,7 @@ console.log(storageProduct);
     addToBasket(storageProduct);
   } else {
     alert(
-      "Veuillez entre un nombre d'articles compris entre 1 et 100 ainsi que le choix d'une couleur"
+      "Veuillez entrer un nombre d'articles compris entre 1 et 100 ainsi que le choix d'une couleur"
     );
   }
 });
