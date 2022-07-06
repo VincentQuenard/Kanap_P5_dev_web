@@ -9,7 +9,7 @@ let arrayTotalProduct = [];
 let totalQuantity = document.getElementById('totalQuantity');
 let totalPrice = document.getElementById('totalPrice');
 
-//O récupère les données du panier
+//On récupère les données du panier
 let basketProducts = JSON.parse(localStorage.getItem('panier'));
 console.log(basketProducts);
 
@@ -25,7 +25,14 @@ if (basketProducts == null) {
     fetch(apiProduct)
       .then((response) => response.json())
       .then((data) => {
+        //On affiche la page panier
         displayBasket(data, product);
+
+        //On affiche le nombre d'articles dans le panier
+        sumOfProducts(product);
+
+        // On affiche le prix total du panier
+        totalPriceOfProducts(data, product);
       })
       .catch((err) => {
         console.log('Erreur' + err);
@@ -102,22 +109,7 @@ const displayBasket = (product, basketProduct) => {
   input.max = '100';
   input.value = basketProduct.quantity;
 
-  //On récupère le nombre d'articles et le prix total des articles(nb * prix)
-  arrayPrice.push(basketProduct.quantity * product.price);
-  arrayTotalProduct.push(parseInt(basketProduct.quantity));
- 
-//Sortir le calcul de la fonction ?
-console.log(arrayTotalProduct);
-
-totalQuantity.textContent = arrayTotalProduct.reduce(
-  (prev, curr) => prev + curr
-);
-totalPrice.textContent = arrayPrice.reduce(
-  (prev, curr) => prev + curr
-);
- console.log(arrayPrice);
- 
-
+  
   //Création balises pour supprimer produit
   const deleteItemContainer = document.createElement('div');
   deleteItemContainer.className = 'cart__item__content__settings__delete';
@@ -128,10 +120,17 @@ totalPrice.textContent = arrayPrice.reduce(
   deleteItem.className = 'deleteItem';
   deleteItem.textContent = 'Supprimer';
 };
- console.log(arrayPrice);
- 
 
+//Fonction qui va calculer le nombre total des produits du panier
+const sumOfProducts = (basketProduct) => {
+  arrayTotalProduct.push(parseInt(basketProduct.quantity));
+  totalQuantity.textContent = arrayTotalProduct.reduce(
+    (prev, curr) => prev + curr
+  );
+};
 
-
-
-
+//Fonction qui va calculer le prix total des produits du panier
+function totalPriceOfProducts(product, basketProduct) {
+  arrayPrice.push(basketProduct.quantity * product.price);
+  totalPrice.textContent = arrayPrice.reduce((prev, curr) => prev + curr);
+}
