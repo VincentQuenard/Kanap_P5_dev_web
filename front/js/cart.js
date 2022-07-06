@@ -105,11 +105,10 @@ const displayBasket = (product, basketProduct) => {
   //On récupère le nombre d'articles et le prix total des articles(nb * prix)
   arrayPrice.push(basketProduct.quantity * product.price);
   arrayTotalProduct.push(parseInt(basketProduct.quantity));
-  console.log(arrayPrice);
-  console.log(arrayTotalProduct);
+ 
 //Calculs à revoir
-  totalQuantity.textContent = `${eval(arrayTotalProduct.join('+'))}`;
-  totalPrice.textContent = `${eval(arrayPrice.join('+'))}`;
+ // totalQuantity.textContent = `${eval(arrayTotalProduct.join('+'))}`;
+ // totalPrice.textContent = `${eval(arrayPrice.join('+'))}`;
 
   //Création balises pour supprimer produit
   const deleteItemContainer = document.createElement('div');
@@ -121,3 +120,25 @@ const displayBasket = (product, basketProduct) => {
   deleteItem.className = 'deleteItem';
   deleteItem.textContent = 'Supprimer';
 };
+ console.log(arrayPrice);
+ 
+
+
+
+
+
+//totalQuantity.textContent = arrayTotalProduct.reduce(
+  //(prev, curr) => prev + curr,
+///  initialValue
+//);
+//console.log(totalQuantity.textContent);
+console.log(arrayTotalProduct);
+const initialValue = 0;
+let test = arrayTotalProduct.reduce((prev, curr) => prev + curr, initialValue);
+console.log(test)
+
+
+//exemple
+const sum = [0, 2, 3, 4, 5].reduce((prev, curr) => prev + curr);
+
+console.log(sum);
