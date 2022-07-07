@@ -109,7 +109,6 @@ const displayBasket = (product, basketProduct) => {
   input.max = '100';
   input.value = basketProduct.quantity;
 
-  
   //Création balises pour supprimer produit
   const deleteItemContainer = document.createElement('div');
   deleteItemContainer.className = 'cart__item__content__settings__delete';
@@ -119,6 +118,11 @@ const displayBasket = (product, basketProduct) => {
   deleteItemContainer.appendChild(deleteItem);
   deleteItem.className = 'deleteItem';
   deleteItem.textContent = 'Supprimer';
+
+  //On appelle la fonction gérant les quantités du panier si l'utilisateur en modifie
+  modifiedQuantity();
+
+  //test code
 };
 
 //Fonction qui va calculer le nombre total des produits du panier
@@ -134,3 +138,45 @@ function totalPriceOfProducts(product, basketProduct) {
   arrayPrice.push(basketProduct.quantity * product.price);
   totalPrice.textContent = arrayPrice.reduce((prev, curr) => prev + curr);
 }
+
+//Modification quantité produit
+const modifiedQuantity = () => {
+  //On sélectionne tous les inputs des quantités des produits
+  let allInputQuantity = document.querySelectorAll('.itemQuantity');
+
+  //On écoute les changements faits sur chacun au niveau quantité
+  for (let InputQuantity of allInputQuantity) {
+    InputQuantity.addEventListener('change', (e) => {
+      //on récupère la valeur de l'input modifié
+      let inputValue = e.target.value;
+
+      //récupération du data-attribut couleur du produit
+      let ciblingProductColor = InputQuantity.closest('article').dataset.color;
+
+      //récupération du data-attribut couleur du produit
+      let ciblingProductId = InputQuantity.closest('article').dataset.id;
+
+      //Si l'id ou la couleur du produit est la même que les données récupérées alors on remplace la quantité qui était stockée par la nouvelle
+      for (let thisProduct of basketProducts) {
+        if (
+          thisProduct.id == ciblingProductId &&
+          thisProduct.color == ciblingProductColor
+        ) {
+          thisProduct.quantity = inputValue;
+        }
+      }
+
+      // Les données récupérées sont sous la forme d'un tableau, on les transforme en chaine de caractère et on met à jour les données stockées dans le localStorage, puis on recharge la page
+      let basketStringify = JSON.stringify(basketProducts);
+
+      localStorage.setItem('panier', basketStringify);
+      location.reload();
+
+      //Si la valeur dans l'input est inférieure à 1 ou supérieure à 100 alors on affiche un message "d'erreur" et on recharge la page
+      if (inputValue >= 100 || inputValue <= 1) {
+        alert('Veuilez choisir une quantité comprise entre 1 et 100');
+        location.reload();
+      }
+    });
+  }
+};
