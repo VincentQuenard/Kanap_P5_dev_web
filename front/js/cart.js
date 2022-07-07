@@ -122,7 +122,9 @@ const displayBasket = (product, basketProduct) => {
   //On appelle la fonction gérant les quantités du panier si l'utilisateur en modifie
   modifiedQuantity();
 
-  //test code
+  //On appelle la fonction qui supprime les produits au clic sur supprimer
+deleteProduct()
+  
 };
 
 //Fonction qui va calculer le nombre total des produits du panier
@@ -134,27 +136,27 @@ const sumOfProducts = (basketProduct) => {
 };
 
 //Fonction qui va calculer le prix total des produits du panier
-function totalPriceOfProducts(product, basketProduct) {
+const totalPriceOfProducts = (product, basketProduct) => {
   arrayPrice.push(basketProduct.quantity * product.price);
   totalPrice.textContent = arrayPrice.reduce((prev, curr) => prev + curr);
-}
+};
 
 //Modification quantité produit
 const modifiedQuantity = () => {
   //On sélectionne tous les inputs des quantités des produits
-  let allInputQuantity = document.querySelectorAll('.itemQuantity');
+  let itemQuantities = document.querySelectorAll('.itemQuantity');
 
   //On écoute les changements faits sur chacun au niveau quantité
-  for (let InputQuantity of allInputQuantity) {
-    InputQuantity.addEventListener('change', (e) => {
+  for (let itemQuantity of itemQuantities) {
+    itemQuantity.addEventListener('change', (e) => {
       //on récupère la valeur de l'input modifié
       let inputValue = e.target.value;
 
       //récupération du data-attribut couleur du produit
-      let ciblingProductColor = InputQuantity.closest('article').dataset.color;
+      let ciblingProductColor = itemQuantity.closest('article').dataset.color;
 
       //récupération du data-attribut couleur du produit
-      let ciblingProductId = InputQuantity.closest('article').dataset.id;
+      let ciblingProductId = itemQuantity.closest('article').dataset.id;
 
       //Si l'id ou la couleur du produit est la même que les données récupérées alors on remplace la quantité qui était stockée par la nouvelle
       for (let thisProduct of basketProducts) {
@@ -167,16 +169,41 @@ const modifiedQuantity = () => {
       }
 
       // Les données récupérées sont sous la forme d'un tableau, on les transforme en chaine de caractère et on met à jour les données stockées dans le localStorage, puis on recharge la page
-      let basketStringify = JSON.stringify(basketProducts);
 
-      localStorage.setItem('panier', basketStringify);
+      localStorage.setItem('panier', JSON.stringify(basketProducts));
       location.reload();
 
       //Si la valeur dans l'input est inférieure à 1 ou supérieure à 100 alors on affiche un message "d'erreur" et on recharge la page
-      if (inputValue >= 100 || inputValue <= 1) {
+      if (inputValue >= 100 || inputValue < 1) {
         alert('Veuilez choisir une quantité comprise entre 1 et 100');
         location.reload();
       }
     });
   }
 };
+
+
+//Suppression produit
+  const deleteProduct = () => {
+    //On sélectionne tous les boutons supprimer
+    let deleteItems = document.querySelectorAll('.deleteItem');
+
+    for (let deleteItem of deleteItems) {
+      //on met un écouteur au clic sur chaque bouton
+      deleteItem.addEventListener('click', () => {
+        //récupération du data-attribut couleur du produit
+        let ciblingProductColor = deleteItem.closest('article').dataset.color;
+
+        //récupération du data-attribut couleur du produit
+        let ciblingProductId = deleteItem.closest('article').dataset.id;
+
+        //on filtre le tableau des produits en ne gardant que les produits dont l'id et la couleur ne sont pas ceux sur lequel on a cliqué
+        basketProducts = basketProducts.filter(
+          (p) => !(p.id == ciblingProductId && p.color == ciblingProductColor)
+        );
+        // Les données récupérées sont sous la forme d'un tableau, on les transforme en chaine de caractère et on met à jour les données stockées dans le localStorage, puis on recharge la page
+        localStorage.setItem('panier', JSON.stringify(basketProducts));
+        location.reload();
+      });
+    }
+  };
