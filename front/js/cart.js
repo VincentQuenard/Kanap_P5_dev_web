@@ -14,8 +14,22 @@ let totalQuantity = document.getElementById('totalQuantity');
 let totalPrice = document.getElementById('totalPrice');
 
 //Regex
-const regexLettres = /^[a-zA-Z-\s]+$/;
-const regexMessagerie = /^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/;
+const regexLettersWithAccents = /[a-zA-Z\-çñàéèêëïîôüù ]{2,}$/;
+const regexAdress = /^\s*\S+(?:\s+\S+){2}/;
+const regexEmail = /^[A-Za-z0-9\-\.]+@([A-Za-z0-9\-]+\.)+[A-Za-z0-9-]{2,4}$/;
+//sélection des balises du formulaire
+const containerForm = document.querySelector('.cart__order__form');
+const firstName = document.getElementById('firstName');
+const firstNameErrorMsg = document.getElementById('firstNameErrorMsg');
+const lastName = document.getElementById('lastName');
+const lastNameErrorMsg = document.getElementById('lastNameErrorMsg');
+const address = document.getElementById('address');
+const addressErrorMsg = document.getElementById('addressErrorMsg');
+const city = document.getElementById('city');
+const cityErrorMsg = document.getElementById('cityErrorMsg');
+const email = document.getElementById('email');
+const emailErrorMsg = document.getElementById('emailErrorMsg');
+const order = document.getElementById('order');
 
 //On récupère les données du panier
 let basketProducts = JSON.parse(localStorage.getItem('panier'));
@@ -147,9 +161,7 @@ const totalPriceOfProducts = (product, basketProduct) => {
   arrayPrice.push(basketProduct.quantity * product.price);
   totalPrice.textContent = arrayPrice.reduce((prev, curr) => prev + curr);
 };
- 
 
-  
 //Fonction gérant modification quantité produit
 const modifiedQuantity = () => {
   //On sélectionne tous les inputs des quantités des produits
@@ -162,7 +174,7 @@ const modifiedQuantity = () => {
       let inputValue = e.target.value;
 
       //On récupère les data attributs des produits pour action sur quantité de produits
-      recupDataAttribut(itemQuantity)
+      recupDataAttribut(itemQuantity);
 
       //Si l'id ou la couleur du produit est la même que les données récupérées alors on remplace la quantité qui était stockée par la nouvelle
       for (let thisProduct of basketProducts) {
@@ -222,5 +234,81 @@ const updateBasket = () => {
   location.reload();
 };
 
+//Vérification des champs du formulaire
+containerForm.addEventListener('input', () => {
+  /*verification le prénom est vide ou à moins de 2 charactères ou contient des chiffres avec la regex*/
+  if (regexLettersWithAccents.test(firstName.value) == false) {
+    firstNameErrorMsg.textContent = 'Veuillez entrer un prénom valide';
+  } else {
+    firstNameErrorMsg.textContent = ''; //pas d'erreur donc pas de message
+  }
+  /*verification le prénom est vide ou à moins de 2 charactères ou contient des chiffres avec la regex*/
+  if (regexLettersWithAccents.test(lastName.value) == false) {
+    lastNameErrorMsg.textContent = 'Veuillez entrer un nom valide';
+  } else {
+    lastNameErrorMsg.textContent = ''; //pas d'erreur donc pas de message
+  }
 
+  //verification adresse valide
+  if (regexAdress.test(address.value) == false) {
+    addressErrorMsg.textContent = 'Veuillez entrer une adresse valide';
+  } else {
+    addressErrorMsg.textContent = ''; //pas d'erreur donc pas de message
+  }
 
+  //verification ville valide
+  if (regexLettersWithAccents.test(city.value) == false) {
+    cityErrorMsg.textContent = 'Veuillez entrer une ville valide';
+  } else {
+    cityErrorMsg.textContent = ''; //pas d'erreur donc pas de message
+  }
+  //verification email valide
+  if (regexEmail.test(email.value) == false) {
+    // Caractère absent ou ne répondant pas aux conditions du regex
+    emailErrorMsg.textContent =
+      'Veuillez entrer une adresse de messagerie valide';
+  } else {
+    // test regex mail ok
+    emailErrorMsg.textContent = '';
+    // Pas d'erreur
+  }
+});
+
+order.addEventListener('click', (e) => {
+  //bloque l'envoi automatique du formulaire s'il n'est pas correctement rempli
+  e.preventDefault();
+  if (
+    //Si tous les champs du formulaire sont remplis
+    firstName.value &&
+    lastName.value &&
+    address.value &&
+    city.value &&
+    email.value
+  ) {
+    console.log('formulaire ok');
+
+    //Objet contact à envoyer au serveur
+    let contact = {
+      firstName: firstName.value,
+      lastName: lastName.value,
+      address: address.value,
+      city: city.value,
+      email: email.value,
+    };
+
+    fetch('http://localhost:3000/api/products/order', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      //exemple cours
+      body: JSON.stringify(jsonBody),
+    })
+      .then((response) => response.json())
+      .then((data) => {})
+      .catch((err) => {
+        console.log('Erreur' + err);
+      });
+  }
+});
