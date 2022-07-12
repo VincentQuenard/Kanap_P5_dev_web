@@ -62,13 +62,6 @@ const displaySelected = (product) => {
   }
 };
 
-
-
-//localStorage.setItem("clé", "valeur")
-//localStorage.getItem("clé")
-//localStorage.clear();
-
-
 //On stocke les données dans le local storage en transformant le tableau en une chaine de charactères
 const saveBasket = (storageProduct) => {
   localStorage.setItem('panier', JSON.stringify(storageProduct));
@@ -129,3 +122,6 @@ buttonAddToCart.addEventListener('click', () => {
 });
 
 
+//localStorage.setItem("clé", "valeur")
+//localStorage.getItem("clé")
+//localStorage.clear();

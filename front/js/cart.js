@@ -4,11 +4,12 @@ const cartItems = document.getElementById('cart__items');
 //On déclare des variables de tableaux vides afin de récupérer le prix total et le nombre total des produits du panier
 let arrayPrice = [];
 let arrayTotalProduct = [];
-
+let totalProducts = 0;
 //On déclare des variables de chaines de caractères vides afin de récupérer les data attributs des produits
 let ciblingProductColor = '';
 let ciblingProductId = '';
 
+let productsData = [];
 //On sélectionne les containers qui affichent le prix total et le nombre total d'articles
 let totalQuantity = document.getElementById('totalQuantity');
 let totalPrice = document.getElementById('totalPrice');
@@ -33,7 +34,6 @@ const order = document.getElementById('order');
 
 //On récupère les données du panier
 let basketProducts = JSON.parse(localStorage.getItem('panier'));
-console.log(basketProducts);
 
 //On boucle sur le tableau du panier et on ne récupère dans le fetch que les données de l'api en fonction des id des produits présents dans le panier
 if (basketProducts == null) {
@@ -50,11 +50,15 @@ if (basketProducts == null) {
         //On affiche la page panier
         displayBasket(data, product);
 
-        //On affiche le nombre d'articles dans le panier
-        sumOfProducts(product);
-
-        // On affiche le prix total du panier
-        totalPriceOfProducts(data, product);
+       
+        
+        productsData.push({
+          id: data._id,
+          price: data.price,
+          quantity: product.quantity,
+        });
+console.log(productsData)
+        calculTotal();
       })
       .catch((err) => {
         console.log('Erreur' + err);
@@ -149,8 +153,11 @@ const displayBasket = (product, basketProduct) => {
 };
 
 //Fonction qui va calculer le nombre total des produits du panier
-const sumOfProducts = (basketProduct) => {
-  arrayTotalProduct.push(parseInt(basketProduct.quantity));
+/*const sumOfProducts = (basketProduct) => {
+  totalProducts = totalProducts + parseInt(basketProduct.quantity);
+  console.log(totalProducts);
+ 
+  /*arrayTotalProduct.push(parseInt(basketProduct.quantity));
   totalQuantity.textContent = arrayTotalProduct.reduce(
     (prev, curr) => prev + curr
   );
@@ -160,6 +167,20 @@ const sumOfProducts = (basketProduct) => {
 const totalPriceOfProducts = (product, basketProduct) => {
   arrayPrice.push(basketProduct.quantity * product.price);
   totalPrice.textContent = arrayPrice.reduce((prev, curr) => prev + curr);
+};
+*/
+
+//Fonction calculant le nombre de produits et le prix dans le panier
+const calculTotal = () => {
+  let quantity = 0;
+  let sum = 0;
+  for (let product of productsData) {
+    quantity = quantity + parseInt(product.quantity);
+    sum = sum + product.quantity * product.price;
+  }
+  
+  totalPrice.textContent = sum;
+  totalQuantity.textContent = quantity;
 };
 
 //Fonction gérant modification quantité produit
@@ -177,23 +198,26 @@ const modifiedQuantity = () => {
       recupDataAttribut(itemQuantity);
 
       //Si l'id ou la couleur du produit est la même que les données récupérées alors on remplace la quantité qui était stockée par la nouvelle
-      for (let thisProduct of basketProducts) {
+
+      for (let thisProduct of productsData) {
         if (
-          thisProduct.id == ciblingProductId &&
-          thisProduct.color == ciblingProductColor
+          thisProduct.id == ciblingProductId
+          // thisProduct.color == ciblingProductColor
         ) {
           thisProduct.quantity = inputValue;
         }
       }
-
       // Mise à jour clé panier
-      updateBasket();
+      updateBasket(ciblingProductId, ciblingProductColor, inputValue);
+      
+      //Mise à jour du total des produits et du prix global
+      calculTotal();
 
       //Si la valeur dans l'input est inférieure à 1 ou supérieure à 100 alors on affiche un message "d'erreur" et on recharge la page
-      if (inputValue >= 100 || inputValue < 1) {
+      /*if (inputValue >= 100 || inputValue < 1) {
         alert('Veuilez choisir une quantité comprise entre 1 et 100');
         location.reload();
-      }
+      }*/
     });
   }
 };
@@ -209,12 +233,10 @@ const deleteProduct = () => {
       //On récupère les data attributs des produits pour supprimer un produit
       recupDataAttribut(deleteItem);
 
-      //on filtre le tableau des produits en ne gardant que les produits dont l'id et la couleur ne sont pas ceux sur lequel on a cliqué
-      basketProducts = basketProducts.filter(
-        (p) => !(p.id == ciblingProductId && p.color == ciblingProductColor)
-      );
+     
+
       // Mise à jour clé panier
-      updateBasket();
+      updateBasket(ciblingProductId, ciblingProductColor, 0);
     });
   }
 };
@@ -229,9 +251,26 @@ const recupDataAttribut = (attribut) => {
 };
 
 // Les données récupérées sont sous la forme d'un tableau, on les transforme en chaine de caractère et on met à jour les données stockées dans le localStorage, puis on recharge la page
-const updateBasket = () => {
+const updateBasket = (ciblingProductId, ciblingProductColor, inputValue) => {
+  let basketProducts = JSON.parse(localStorage.getItem('panier'));
+  // S'il y a un nombre supérieur à 0 de produits et que l'id et la couleur  sont  ceux sur lesquels il y a eu une modification
+  if (inputValue > 0) {
+    for (let thisProduct of basketProducts) {
+      if (
+        thisProduct.id == ciblingProductId &&
+        thisProduct.color == ciblingProductColor
+      ) {
+        thisProduct.quantity = inputValue;
+      }
+    }
+  } else {
+    //Sinon on filtre le tableau des produits en n'affichant que les produits ayant une quantité
+    basketProducts = basketProducts.filter(
+      (p) => !(p.id == ciblingProductId && p.color == ciblingProductColor)
+    );
+  }
+
   localStorage.setItem('panier', JSON.stringify(basketProducts));
-  location.reload();
 };
 
 //Vérification des champs du formulaire
@@ -295,6 +334,14 @@ order.addEventListener('click', (e) => {
       city: city.value,
       email: email.value,
     };
+    console.log(contact);
+
+    //tableau produits à envoyer au serveur en ne gardant que les id
+    let products = basketProducts.map((product) => product.id);
+
+    // variable order regroupant les objets contact et products à envoyer au back-end pour valider la commande
+    let order = { contact: contact, products: products };
+    console.log(order);
 
     fetch('http://localhost:3000/api/products/order', {
       method: 'POST',
@@ -302,13 +349,25 @@ order.addEventListener('click', (e) => {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      //exemple cours
-      body: JSON.stringify(jsonBody),
+
+      body: JSON.stringify(order),
     })
       .then((response) => response.json())
-      .then((data) => {})
+      .then((data) => {
+        console.log(data);
+        window.location.href = `./confirmation.html?orderId=${data.orderId}`;
+        console.log('confirmation.html?orderId=' + data.orderId);
+      })
       .catch((err) => {
         console.log('Erreur' + err);
       });
+  } else {
+    alert('Veuillez complèter tous les champs du formulaire');
   }
 });
+
+//localStorage.setItem("clé", "valeur")
+//localStorage.getItem("clé")
+//localStorage.clear();
+
+// Appel à l'api order pour envoyer les tableaux
