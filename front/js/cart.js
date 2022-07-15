@@ -1,13 +1,16 @@
 //on seléctionne le container qui va recevoir les données pour créer le panier en le stockant dans une variable
 const cartItems = document.getElementById('cart__items');
 
-//On initialise une variable à 0 qui servira à calculer le nombre de produits total ainsi que 
+//On initialise une variable à 0 qui servira à calculer le nombre de produits total ainsi que
 let totalProducts = 0;
+
 //On déclare des variables de chaines de caractères vides afin de récupérer les data attributs des produits
 let ciblingProductColor = '';
 let ciblingProductId = '';
 
+// On déclare une tableau vide dans le lequel on va récupérer l'id, la couleur, la quantité et le prix des porduits du panier
 let productsData = [];
+
 //On sélectionne les containers qui affichent le prix total et le nombre total d'articles
 let totalQuantity = document.getElementById('totalQuantity');
 let totalPrice = document.getElementById('totalPrice');
@@ -16,7 +19,7 @@ let totalPrice = document.getElementById('totalPrice');
 const regexLettersWithAccents = /[a-zA-Z\-çñàéèêëïîôüù ]{2,}$/;
 const regexAdress = /^\s*\S+(?:\s+\S+){2}/;
 const regexEmail = /^[A-Za-z0-9\-\.]+@([A-Za-z0-9\-]+\.)+[A-Za-z0-9-]{2,4}$/;
-//sélection des balises du formulaire
+//sélection les balises du formulaire
 const containerForm = document.querySelector('.cart__order__form');
 const firstName = document.getElementById('firstName');
 const firstNameErrorMsg = document.getElementById('firstNameErrorMsg');
@@ -34,7 +37,7 @@ const order = document.getElementById('order');
 let basketProducts = JSON.parse(localStorage.getItem('panier'));
 
 //On boucle sur le tableau du panier et on ne récupère dans le fetch que les données de l'api en fonction des id des produits présents dans le panier
-if (basketProducts == null || basketProducts ===[]) {
+if (basketProducts == null || basketProducts === []) {
   let h2 = document.createElement('h2');
   cartItems.appendChild(h2);
   h2.textContent = 'Aucun produit dans votre panier';
@@ -52,7 +55,7 @@ if (basketProducts == null || basketProducts ===[]) {
           id: data._id,
           price: data.price,
           quantity: product.quantity,
-          color : product.color
+          color: product.color,
         });
         console.log(productsData);
         calculTotal();
@@ -157,7 +160,7 @@ const calculTotal = () => {
     quantity = quantity + parseInt(product.quantity);
     sum = sum + product.quantity * product.price;
   }
-
+  //On affiche le prix et la quantité de tous les produits
   totalPrice.textContent = sum;
   totalQuantity.textContent = quantity;
 };
@@ -180,7 +183,8 @@ const modifiedQuantity = () => {
 
       for (let thisProduct of productsData) {
         if (
-          thisProduct.id == ciblingProductId && thisProduct.color == ciblingProductColor
+          thisProduct.id == ciblingProductId &&
+          thisProduct.color == ciblingProductColor
         ) {
           thisProduct.quantity = inputValue;
         }
@@ -190,12 +194,6 @@ const modifiedQuantity = () => {
 
       //Mise à jour du total des produits et du prix global
       calculTotal();
-
-      //Si la valeur dans l'input est inférieure à 1 ou supérieure à 100 alors on affiche un message "d'erreur" et on recharge la page
-      /*if (inputValue >= 100 || inputValue < 1) {
-        alert('Veuilez choisir une quantité comprise entre 1 et 100');
-        location.reload();
-      }*/
     });
   }
 };
@@ -208,23 +206,22 @@ const deleteProduct = () => {
   for (let deleteItem of deleteItems) {
     //on met un écouteur au clic sur chaque bouton
     deleteItem.addEventListener('click', () => {
-
       //On récupère les data attributs des produits pour supprimer un produit
 
       recupDataAttribut(deleteItem);
 
       // Si le produit ciblé a supprimer a l'id et la couleur de celui dans le tableau on le retire du DOM et donc de l'affichage de la page
-  
-     for (let productData of productsData) {
-       if (
-         productData.id == ciblingProductId &&
-         productData.color == ciblingProductColor
-       ) {
-         productData.quantity = 0;
-         deleteItem.closest('article').remove();
-       }
-     }
- calculTotal();
+
+      for (let productData of productsData) {
+        if (
+          productData.id == ciblingProductId &&
+          productData.color == ciblingProductColor
+        ) {
+          productData.quantity = 0;
+          deleteItem.closest('article').remove();
+        }
+      }
+      calculTotal();
 
       // Mise à jour clé panier
       updateBasket(ciblingProductId, ciblingProductColor, 0);
@@ -315,8 +312,6 @@ order.addEventListener('click', (e) => {
     city.value &&
     email.value
   ) {
-    console.log('formulaire ok');
-
     //Objet contact à envoyer au serveur
     let contact = {
       firstName: firstName.value,
@@ -325,14 +320,12 @@ order.addEventListener('click', (e) => {
       city: city.value,
       email: email.value,
     };
-    console.log(contact);
 
     //tableau produits à envoyer au serveur en ne gardant que les id
     let products = basketProducts.map((product) => product.id);
 
     // variable order regroupant les objets contact et products à envoyer au back-end pour valider la commande
     let order = { contact: contact, products: products };
-    console.log(order);
 
     fetch('http://localhost:3000/api/products/order', {
       method: 'POST',
@@ -345,8 +338,7 @@ order.addEventListener('click', (e) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
-       window.location.href = `./confirmation.html?orderId=${data.orderId}`;
+        window.location.href = `./confirmation.html?orderId=${data.orderId}`;
         console.log('confirmation.html?orderId=' + data.orderId);
       })
       .catch((err) => {
@@ -360,4 +352,3 @@ order.addEventListener('click', (e) => {
 //localStorage.setItem("clé", "valeur")
 //localStorage.getItem("clé")
 //localStorage.clear();
-
