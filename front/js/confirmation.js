@@ -5,5 +5,4 @@ const orderIdNumber = new URL(document.location).searchParams.get('orderId');
 const orderId = document.getElementById('orderId');
 orderId.textContent = `${orderIdNumber}`;
 
-//On vide le local storage une fois la commande terminée
-localStorage.clear();
+

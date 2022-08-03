@@ -85,7 +85,7 @@ const addToBasket = (product) => {
   );
 
   if (searchProduct != undefined) {
-    //Si le produit existe id/couleur ont ajoute la quantité à la précédente
+    //Si le produit existe id/couleur on ajoute la quantité à la précédente
     searchProduct.quantity =
       parseInt(searchProduct.quantity) +
       parseInt(product.quantity);
@@ -93,7 +93,7 @@ const addToBasket = (product) => {
     //Sinon on ajoute le produit au localStorage
     panier.push(product);
   }
-  console.log(getBasket());
+  
 //on met à jour le localStorage 
   saveBasket(panier);
 };
@@ -120,8 +120,3 @@ buttonAddToCart.addEventListener('click', () => {
     );
   }
 });
-
-
-//localStorage.setItem("clé", "valeur")
-//localStorage.getItem("clé")
-//localStorage.clear();
