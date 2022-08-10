@@ -162,7 +162,6 @@ const calculTotal = () => {
   totalQuantity.textContent = quantity;
 };
 
-
 //Fonction gérant modification quantité produit
 const modifiedQuantity = () => {
   //On sélectionne tous les inputs des quantités des produits
@@ -191,7 +190,7 @@ const modifiedQuantity = () => {
           thisProduct.quantity = inputValue;
         }
       }
-      // Mise à jour clé panier
+      // Mise à jour  panier
       updateBasket(ciblingProductId, ciblingProductColor, inputValue);
 
       //Mise à jour du total des produits et du prix global
@@ -229,7 +228,7 @@ const deleteProduct = () => {
       }
       calculTotal();
 
-      // Mise à jour clé panier
+      // Mise à jour  panier
       updateBasket(ciblingProductId, ciblingProductColor, 0);
     });
   }
@@ -302,6 +301,67 @@ order.addEventListener('click', (e) => {
   //bloque l'envoi automatique du formulaire s'il n'est pas correctement rempli
   e.preventDefault();
   if (
+    //Si tous les champs du formulaire sont vides alert
+    firstName.value === '' &&
+    lastName.value === '' &&
+    address.value === '' &&
+    city.value === '' &&
+    email.value === ''
+  ) {
+    alert('Veuillez complèter tous les champs du formulaire');
+  } else if (
+    //Si les entrées ne respectent pas les contraintes des regex alert
+    regexLettersWithAccents.test(firstName.value) == false ||
+    regexLettersWithAccents.test(lastName.value) == false ||
+    regexAdress.test(address.value) == false ||
+    regexLettersWithAccents.test(city.value) == false ||
+    regexEmail.test(email.value) == false
+  ) {
+    alert('Veuillez complèter correctement les champs du formulaire');
+  } else {
+//Si tout est ok au niveau du formuliaire on peut envoyer la commande avec les infos
+
+    //Objet contact à envoyer au serveur
+    let contactInfo = {
+      firstName: firstName.value,
+      lastName: lastName.value,
+      address: address.value,
+      city: city.value,
+      email: email.value,
+    };
+
+    //tableau produits à envoyer au serveur en ne gardant que les id
+    let productIds = basketProducts.map((product) => product.id);
+
+    // variable order regroupant les objets contact et products à envoyer au back-end pour valider la commande
+    let order = { contact: contactInfo, products: productIds };
+
+    fetch('http://localhost:3000/api/products/order', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+
+      body: JSON.stringify(order),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        //On vide le panier du local storage une fois la commande terminée
+        localStorage.removeItem('panier');
+        window.location.href = `./confirmation.html?orderId=${data.orderId}`;
+      })
+      .catch((err) => {
+        console.log('Erreur' + err);
+      });
+  }
+});
+
+//Code avant modifs remarques évaluateur
+/*order.addEventListener('click', (e) => {
+  //bloque l'envoi automatique du formulaire s'il n'est pas correctement rempli
+  e.preventDefault();
+  if (
     //Si tous les champs du formulaire sont remplis
     firstName.value &&
     lastName.value &&
@@ -345,4 +405,4 @@ order.addEventListener('click', (e) => {
   } else {
     alert('Veuillez complèter tous les champs du formulaire');
   }
-});
+});*/

@@ -106,17 +106,30 @@ buttonAddToCart.addEventListener('click', () => {
     quantity: quantitySelection.value,
 
   };
+if (colorSelection.value == '') {
+  alert('Veuillez choisir une couleur');
+}else if (quantitySelection.value ==0 ||
+    quantitySelection.value >= 100){
+alert(
+  "Veuillez entrer un nombre d'articles compris entre 1 et 100 "
+);
+    }else{
+      alert('votre produit a bien été ajouté au panier');
+      addToBasket(storageProduct);
+    }
 
-  // Si l'utilisateur a entrer un nombre d'article entre 1 et 100 et une couleur, on sauve son panier, sinon popup alert
-  if (
+    //Code avant modifs remarques évaluateur
+  // Si l'utilisateur a entré un nombre d'article entre 1 et 100 et une couleur, on sauve son panier, sinon popup alert
+  /*if (
     quantitySelection.value >= 1 &&
     quantitySelection.value <= 100 &&
     colorSelection.value != ''
   ) {
+    alert('votre produit a bien été ajouté au panier');
     addToBasket(storageProduct);
   } else {
     alert(
       "Veuillez entrer un nombre d'articles compris entre 1 et 100 ainsi que le choix d'une couleur"
     );
-  }
+  }*/
 });
