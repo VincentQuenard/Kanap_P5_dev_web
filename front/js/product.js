@@ -80,21 +80,20 @@ const getBasket = () => {
 const addToBasket = (product) => {
   let panier = getBasket();
   let searchProduct = panier.find(
-    (p) =>
-      p.product == product.product && p.color == product.color
+    (p) => p.product == product.product && p.color == product.color
   );
-
   if (searchProduct != undefined) {
     //Si le produit existe id/couleur on ajoute la quantité à la précédente
     searchProduct.quantity =
-      parseInt(searchProduct.quantity) +
-      parseInt(product.quantity);
+      parseInt(searchProduct.quantity) + parseInt(product.quantity);
+    alert('la quantité a bien été mise à jour dans le panier');
   } else {
     //Sinon on ajoute le produit au localStorage
     panier.push(product);
+    alert('votre produit a bien été ajouté au panier');
   }
-  
-//on met à jour le localStorage 
+
+  //on met à jour le localStorage
   saveBasket(panier);
 };
 
@@ -104,32 +103,28 @@ buttonAddToCart.addEventListener('click', () => {
     id: idProduct,
     color: colorSelection.value,
     quantity: quantitySelection.value,
-
   };
-if (colorSelection.value == '') {
-  alert('Veuillez choisir une couleur');
-}else if (quantitySelection.value ==0 ||
-    quantitySelection.value >= 100){
-alert(
-  "Veuillez entrer un nombre d'articles compris entre 1 et 100 "
-);
-    }else{
-      alert('votre produit a bien été ajouté au panier');
-      addToBasket(storageProduct);
-    }
 
-    //Code avant modifs remarques évaluateur
-  // Si l'utilisateur a entré un nombre d'article entre 1 et 100 et une couleur, on sauve son panier, sinon popup alert
-  /*if (
-    quantitySelection.value >= 1 &&
-    quantitySelection.value <= 100 &&
-    colorSelection.value != ''
-  ) {
-    alert('votre produit a bien été ajouté au panier');
-    addToBasket(storageProduct);
-  } else {
+  let quantityValid = quantitySelection.value > 0 && quantitySelection.value <= 100;
+  let colorValid = !!colorSelection.value;
+  
+  
+  if (!colorValid && !quantityValid) {
     alert(
-      "Veuillez entrer un nombre d'articles compris entre 1 et 100 ainsi que le choix d'une couleur"
+      'Veuillez choisir une couleur et une quantité comprise entre 1 et 100'
     );
-  }*/
+    return;
+  }
+
+  if (!colorValid && quantityValid) {
+    alert('Veuillez choisir une couleur');
+    return;
+  }
+
+  if (!quantityValid && colorValid) {
+    alert("Veuillez entrer un nombre d'articles compris entre 1 et 100 ");
+    return;
+  }
+  addToBasket(storageProduct);
+
 });

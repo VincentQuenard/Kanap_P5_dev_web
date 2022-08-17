@@ -309,7 +309,9 @@ order.addEventListener('click', (e) => {
     email.value === ''
   ) {
     alert('Veuillez complèter tous les champs du formulaire');
-  } else if (
+    return;
+  }
+  if (
     //Si les entrées ne respectent pas les contraintes des regex alert
     regexLettersWithAccents.test(firstName.value) == false ||
     regexLettersWithAccents.test(lastName.value) == false ||
@@ -318,91 +320,43 @@ order.addEventListener('click', (e) => {
     regexEmail.test(email.value) == false
   ) {
     alert('Veuillez complèter correctement les champs du formulaire');
-  } else {
-//Si tout est ok au niveau du formuliaire on peut envoyer la commande avec les infos
-
-    //Objet contact à envoyer au serveur
-    let contactInfo = {
-      firstName: firstName.value,
-      lastName: lastName.value,
-      address: address.value,
-      city: city.value,
-      email: email.value,
-    };
-
-    //tableau produits à envoyer au serveur en ne gardant que les id
-    let productIds = basketProducts.map((product) => product.id);
-
-    // variable order regroupant les objets contact et products à envoyer au back-end pour valider la commande
-    let order = { contact: contactInfo, products: productIds };
-
-    fetch('http://localhost:3000/api/products/order', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-
-      body: JSON.stringify(order),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        //On vide le panier du local storage une fois la commande terminée
-        localStorage.removeItem('panier');
-        window.location.href = `./confirmation.html?orderId=${data.orderId}`;
-      })
-      .catch((err) => {
-        console.log('Erreur' + err);
-      });
+    return;
   }
+
+  //Objet contact à envoyer au serveur
+  let contactInfo = {
+    firstName: firstName.value,
+    lastName: lastName.value,
+    address: address.value,
+    city: city.value,
+    email: email.value,
+  };
+  //Si tout est ok au niveau du formulaire on peut envoyer la commande avec les infos
+  orderProducts(contactInfo);
 });
+const orderProducts = (info) => {
+  //tableau produits à envoyer au serveur en ne gardant que les id
+  let productIds = basketProducts.map((product) => product.id);
 
-//Code avant modifs remarques évaluateur
-/*order.addEventListener('click', (e) => {
-  //bloque l'envoi automatique du formulaire s'il n'est pas correctement rempli
-  e.preventDefault();
-  if (
-    //Si tous les champs du formulaire sont remplis
-    firstName.value &&
-    lastName.value &&
-    address.value &&
-    city.value &&
-    email.value
-  ) {
-    //Objet contact à envoyer au serveur
-    let contactInfo = {
-      firstName: firstName.value,
-      lastName: lastName.value,
-      address: address.value,
-      city: city.value,
-      email: email.value,
-    };
+  // variable order regroupant les objets contact et products à envoyer au back-end pour valider la commande
+  let order = { contact: info, products: productIds };
 
-    //tableau produits à envoyer au serveur en ne gardant que les id
-    let productIds = basketProducts.map((product) => product.id);
+  fetch('http://localhost:3000/api/products/order', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
 
-    // variable order regroupant les objets contact et products à envoyer au back-end pour valider la commande
-    let order = { contact: contactInfo, products: productIds };
-
-    fetch('http://localhost:3000/api/products/order', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-
-      body: JSON.stringify(order),
+    body: JSON.stringify(order),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      //On vide le panier du local storage une fois la commande terminée
+      localStorage.removeItem('panier');
+      window.location.href = `./confirmation.html?orderId=${data.orderId}`;
     })
-      .then((response) => response.json())
-      .then((data) => {
-        //On vide le panier du local storage une fois la commande terminée
-        localStorage.removeItem('panier');
-        window.location.href = `./confirmation.html?orderId=${data.orderId}`;
-      })
-      .catch((err) => {
-        console.log('Erreur' + err);
-      });
-  } else {
-    alert('Veuillez complèter tous les champs du formulaire');
-  }
-});*/
+    .catch((err) => {
+      console.log('Erreur' + err);
+    });
+};
